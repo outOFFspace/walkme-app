@@ -52,7 +52,6 @@ module.exports = {
             }
         }
 
-        console.time('1');
         const chunks = chunk(endpointsPromises, 100);
         const response = {};
         for (let i = 0; i < chunks.length; i++) {
@@ -61,7 +60,6 @@ module.exports = {
                 Object.assign(response, item);
             });
         }
-        console.timeEnd('1');
         return response;
     }
 }
