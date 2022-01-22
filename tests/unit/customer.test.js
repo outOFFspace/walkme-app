@@ -9,7 +9,7 @@ describe('Fetch customers', () => {
     });
 
     test('customer with id 99999 does not exists', () => {
-        expect(findCustomerById(99999)).toBeFalsy();
+        expect(findCustomerById(666)).toBeFalsy();
     });
 
     test('customer with non numeric id does not exists', () => {
