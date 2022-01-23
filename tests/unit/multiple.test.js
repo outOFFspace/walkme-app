@@ -65,7 +65,7 @@ const generateEndpointQuery = (n) => {
     return query;
 }
 
-describe('Multiple endpoints', () => {
+describe('Multiple endpoint', () => {
     test('fetch multiple endpoints', async () => {
         const resp = await fetchMultipleEndpoints({
             bob: '/customers/13',
@@ -104,6 +104,10 @@ describe('Multiple endpoints', () => {
 
     test('throw exception on null endpoints params', async () => {
         await expect(fetchMultipleEndpoints(null)).rejects.toThrow(WrongEndpointsException);
+    });
+
+    test('should return an empty object if the route is not specified', async () => {
+        await expect(fetchMultipleEndpoints({123: ''})).resolves.toStrictEqual({});
     });
 });
 
