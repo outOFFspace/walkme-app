@@ -17,6 +17,27 @@ const isObject = (obj) => {
     return Object.prototype.toString.call(obj) === '[object Object]';
 };
 
+const fetchData = (uniqueId, route) => {
+    return request({
+        url: route,
+        baseURL: `${host}:${port}`
+    }).then((res) => {
+        return {
+            [uniqueId]: {data: res.data}
+        }
+    }).catch((e) => {
+            return {
+                [uniqueId]: {
+                    status: get(e, 'response.status', 404),
+                    response: {
+                        message: get(e, 'response.data.response', `${uniqueId} does not exist`)
+                    }
+                }
+            }
+        }
+    );
+}
+
 module.exports = {
     async fetchMultipleEndpoints(query) {
         if (!isObject(query) || !Object.keys(query).length) {
@@ -30,25 +51,7 @@ module.exports = {
                 if (Array.isArray(route)) {
                     [route] = query[uniqueId];
                 }
-                endpointsPromises.push(request({
-                        url: route,
-                        baseURL: `${host}:${port}`,
-                    })
-                    .then((res) => {
-                        return {
-                            [uniqueId]: {data: res.data}
-                        }
-                    }).catch((e) => {
-                        return {
-                            [uniqueId]: {
-                                status: get(e, 'response.status', 404),
-                                response: {
-                                    message: get(e, 'response.data.response', `${uniqueId} does not exist`)
-                                }
-                            }};
-                        }
-                    )
-                )
+                endpointsPromises.push(fetchData(uniqueId, route))
             }
         }
 

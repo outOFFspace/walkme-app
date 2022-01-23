@@ -4,8 +4,6 @@ const {host, port} = require('../../config');
 const {fetchMultipleEndpoints} = require('../../services/multiple');
 const WrongEndpointsException = require('../../errors/WrongEndpointsException');
 
-// jest.mock('axios');
-
 const basePath = `${host}:${port}`;
 
 const getRandomInt = (min, max) => {
@@ -67,7 +65,7 @@ const generateEndpointQuery = (n) => {
     return query;
 }
 
-describe('Multiple endpoint', () => {
+describe('Multiple endpoints', () => {
     test('fetch multiple endpoints', async () => {
         const resp = await fetchMultipleEndpoints({
             bob: '/customers/13',
