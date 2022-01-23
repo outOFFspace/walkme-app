@@ -51,7 +51,9 @@ module.exports = {
                 if (Array.isArray(route)) {
                     [route] = query[uniqueId];
                 }
-                endpointsPromises.push(fetchData(uniqueId, route))
+                if (route) {
+                    endpointsPromises.push(fetchData(uniqueId, route))
+                }
             }
         }
 
