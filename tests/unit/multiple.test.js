@@ -1,10 +1,8 @@
 const axios = require('axios');
-const nock = require('nock');
-const {host, port} = require('../../config');
 const {fetchMultipleEndpoints} = require('../../services/multiple');
 const WrongEndpointsException = require('../../errors/WrongEndpointsException');
 
-const basePath = `${host}:${port}`;
+jest.mock('axios');
 
 const getRandomInt = (min, max) => {
     min = Math.ceil(min);
@@ -111,23 +109,25 @@ describe('Multiple endpoint', () => {
     });
 });
 
-describe('Testing Errors caused by HTTP Response', () => {
-    let scope;
+describe('Server didn’t respond to some of the sub-endpoints', () => {
+    axios.get.mockImplementation((url) => {
+        switch (url) {
+            case '/customers/13':
+                return Promise.resolve({data: {name: 'Bob', id: 13, age: 27}})
+            case '/customers/25':
+                return Promise.reject(new Error('Network error'))
+        }
+    })
 
-    beforeAll(() => {
-        scope = nock(basePath)
-            .get('/customers/13')
-            .delay(3000) // delay the response for extra realism
-            .reply(504);
-    });
-
-    it('remote server does not respond in time', async () => {
-        await expect(axios.get(
-            `${basePath}/customers/13`
-        )).rejects.toThrowError('Request failed with status code 504');
-    }, 5000);
-
-    afterAll(() => {
-        scope.done();
-    });
-});
+    test('simulate endpoint rejection with an error', () => {
+        Promise.allSettled([
+            axios.get('/customers/13'),
+            axios.get('/customers/25')
+        ]).then((resp) => {
+            expect(resp[0].status).toBe('fulfilled');
+            expect(resp[0].value).toHaveProperty('data.name', 'Bob');
+            expect(resp[1].status).toBe('rejected');
+            expect(resp[1].value).toBe(undefined);
+        });
+    })
+})
